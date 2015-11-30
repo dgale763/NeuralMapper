@@ -13,7 +13,7 @@ import neuralmapper.model.OutputNode;
  *
  * @author David
  */
-public class Network {
+public class Network implements Cloneable{
     
     private ArrayList<InputNode> inputList;
     private ArrayList<ArrayList<DeepNode>> deepList;
@@ -25,6 +25,30 @@ public class Network {
         deepList = new ArrayList<>();
         outputList = new ArrayList<>();
         lastDeepList = new ArrayList<>();
+    }
+    
+    public Object clone() throws CloneNotSupportedException {
+        Network clone=(Network)super.clone();
+        // make the shallow copy of the object of type Department
+//        clone.depart=(Department)depart.clone();
+        
+        return clone;
+  }
+    
+    public int getIn(){
+        return inputList.size();
+    }
+    
+    public int getDeepColumns(){
+        return deepList.size();
+    }
+    
+    public int getDeepRows(){
+        return deepList.get(0).size();
+    }
+    
+    public int getOut(){
+        return outputList.size();
     }
     
     public ArrayList<InputNode> getInputNodes(){

@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package neuralmapper;
+import neuralmapper.model.NetworkControl;
+import neuralmapper.view.GUIControl;
+import neuralmapper.controller.MainControl;
 
 
 /**
@@ -15,8 +18,14 @@ public class NeuralMapper {
     /**
      * @param args the command line arguments
      */
+    private static NetworkControl network;
+    private static GUIControl gui;
+    private static MainControl controller;
+    
     public static void main(String[] args) {
-        // TODO code application logic here
+        network = new NetworkControl();
+        gui = new GUIControl();
+        controller = new MainControl(network, gui);
     }
     
 }

@@ -10,19 +10,42 @@ package neuralmapper.model;
  *
  * @author David
  */
-public class NetworkControl {
+public class NetworkControl{
 
     /**
      * @param args the command line arguments
      */
     
-    public static Network network;
+    public Network network;
     
-    public static void main(String[] args) {
+    public NetworkControl() {
+    }
+    
+    public void build(int in, int dC, int dR, int out){
         network = new Network();
-        network.buildNetwork(2,1,3,1); // Inputs, Deep Columns, Deep Rows, Outputs
+        network.buildNetwork(in, dC, dR, out); // Inputs, Deep Columns, Deep Rows, Outputs
         network.printNumNodes();
         network.printOutputs();
+    }
+    
+    public Network getNetwork(){
+        return network;
+    }
+    
+    public int getIn(){
+        return network.getIn();
+    }
+    
+    public int getDeepColumns(){
+        return network.getDeepColumns();
+    }
+    
+    public int getDeepRows(){
+        return network.getDeepRows();
+    }
+    
+    public int getOut(){
+        return network.getOut();
     }
     
 }
