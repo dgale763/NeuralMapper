@@ -18,14 +18,15 @@ public class MainControl {
         network.build(2,1,2,1);
 
         // Translate network to GUI
+        
+        
+        // Show GUI
+        gui.createAndShowGUI();
         try{
-            gui.setNetBase((Network)network.getNetwork().clone());
+            gui.getContentPane().setNetBase((Network)network.getNetwork().clone());
         }
         catch(Exception e){
             System.out.println("Error Cloning Network in transfer to GUI");
         }
-        
-        // Show GUI
-        gui.createAndShowGUI();
     }
 }

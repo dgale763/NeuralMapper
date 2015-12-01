@@ -10,7 +10,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.*;
 import java.io.*;
-import java.awt.datatransfer.Clipboard;
+
 import static java.awt.print.Printable.NO_SUCH_PAGE;
 import static java.awt.print.Printable.PAGE_EXISTS;
 import java.io.Serializable;
@@ -22,6 +22,7 @@ public class GUIControl extends JPanel
                          Printable{
     private Dimension area; //indicates area taken up by graphics
     private Vector<Rectangle> GraphicObjects; //coordinates used to draw graphics
+    private JComponent newContentPane;
     private JPanel drawingPane;
     private Point clickPoint;
     private Color rgb = new Color(255,0,0);
@@ -44,7 +45,7 @@ public class GUIControl extends JPanel
         
         clickPoint = new Point(0,0);
         area = new Dimension(0,0);
-        GraphicObjects = new Vector<Rectangle>();
+        GraphicObjects = new Vector<>();
         
         menuBar = new JMenuBar();
         
@@ -108,6 +109,7 @@ public class GUIControl extends JPanel
         drawingPane = new DrawingPane();
         drawingPane.setBackground(Color.white);
         drawingPane.addMouseListener(this);
+        System.out.println("re initializing");
 
         //Put the drawing area in a scroll pane.
         JScrollPane scroller = new JScrollPane(drawingPane);
@@ -326,27 +328,16 @@ public class GUIControl extends JPanel
     /** The component inside the scroll pane. */
     public class DrawingPane extends JPanel {
         protected void paintComponent(Graphics g) {
-//            super.paintComponent(g);
-//
-//            Rectangle rect;
-//            for (int i = 0; i < GraphicObjects.size(); i++) {
-//                rect = GraphicObjects.elementAt(i);
-//                g.setColor(colors.get(i));
-////                Color clearColor = new Color(0,0,0,0);
-//                if(shapeList.get(i) == 0){
-//                    g.drawOval(rect.x, rect.y, rect.width, rect.height);
-//                }
-//                else if(shapeList.get(i) == 1){
-//                    g.drawLine(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
-//                }
-//            }
             super.paintComponent(g);
             Rectangle rect;
+//            System.out.println("GO SIZE: ");
+            System.out.println(GraphicObjects.size());
             for(int i = 0; i < GraphicObjects.size(); i++) {
                 rect = GraphicObjects.elementAt(i);
                 g.setColor(Color.RED);
                 g.drawOval(rect.x, rect.y, rect.width, rect.height);
             }
+//            g.drawOval(0,0,50,50);
         }
     }
 
@@ -369,24 +360,68 @@ public class GUIControl extends JPanel
         int numDeepCol = networkClone.getDeepColumns();
         int numDeepRow = networkClone.getDeepRows();
         int numOut = networkClone.getOut();
-
+        
+        int inStart = 20;
+        int deepStart = 20;
+        int outStart = 20;
+//        int mod = -20;
+        
+        int yOrigin = 0;
+        
+        // Change yOrigin for number of nodes
+        int tallestNode = 0;
+        if(numIn > tallestNode){
+            tallestNode = numIn;
+        }
+        else if(numDeepRow > tallestNode){
+            tallestNode = numDeepRow;
+        }
+        else if(numOut > tallestNode){
+            tallestNode = numOut;
+        }
+        yOrigin = 30*(tallestNode + 1);
+        
+        // Change starting Y for even/odd number of nodes
+        if(numIn % 2 == 0){
+            inStart = 50;
+        }
+        
+        if(numDeepRow % 2 == 0){
+            deepStart = 50;
+        }
+        
+        if(numOut % 2 == 0){
+            outStart = 50;
+        }
+        
         int curCol = 0;
         int curRow = 0;
+        int w = 40;
+        int h = 40;
+        int colSep = 20;
+        int rowSep = 20;
+        int inverter = -1;
+        GraphicObjects.add(new Rectangle(0,yOrigin,400,1));
+        
         Rectangle rect;
         // Paint Input Nodes
         for(int i = 0;i<numIn;i++){
-            rect = new Rectangle(curCol*10,curRow*10, 5,5);
+            rect = new Rectangle((w+colSep)*curCol,yOrigin+((inStart+((h+rowSep)*(curRow+1)))*(int)Math.pow(inverter, (double)i)),w,h);
+            // yOrigin + ((inStart + (curRow)*(rowWeight)) * (inv^i)
+            // 90      + ((60      + (0     )*(60       )) * (1)
+            // 90 + 60
+            // 150
             GraphicObjects.add(rect);
-            curRow++;
+//            curRow++;
         }
         curRow = 0;
         curCol++;
 
         // Paint Deep Nodes
-        for(int i = 0;i<numDeepCol;i++){
+        for(int i = 1;i<=numDeepCol;i++){
             for(int j=0;j<numDeepRow;j++){
-                rect = new Rectangle(curCol*10,curRow*10,5,5);
-                GraphicObjects.add(rect);
+//                rect = new Rectangle((w+colSep)*curCol,curRow*rowWeight,w,h);
+//                GraphicObjects.add(rect);
                 curRow++;
             }
             curRow = 0;
@@ -395,13 +430,16 @@ public class GUIControl extends JPanel
         curRow = 0;
 
         // Paint Output Nodes
-        for(int i = 0; i < numOut; i++) {
-            rect = new Rectangle(curCol*10,curRow*10,5,5);
-            GraphicObjects.add(rect);
+        for(int i = 1; i <= numOut; i++) {
+//            rect = new Rectangle((w+colSep)*curCol,curRow*rowWeight,w,h);
+//            GraphicObjects.add(rect);
             curRow++;
         }
         curCol++;
         curRow = 0;
+        System.out.println(GraphicObjects.size());
+        drawingPane.revalidate();
+        drawingPane.repaint();
     }
     /**
      * Create the GUI and show it.  For thread safety,
@@ -410,7 +448,7 @@ public class GUIControl extends JPanel
      */
     public void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame("Rectangle Drawing Demo");
+        JFrame frame = new JFrame("Neural Mapper");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter(){
             @Override
@@ -420,13 +458,17 @@ public class GUIControl extends JPanel
         });
 
         //Create and set up the content pane.
-        JComponent newContentPane = new GUIControl();
+        newContentPane = new GUIControl();
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
 
         //Display the window.
         frame.pack();
         frame.setVisible(true);
+    }
+    
+    public GUIControl getContentPane(){
+        return (GUIControl)newContentPane;
     }
     
     public int print(Graphics gg, PageFormat pf, int page) throws PrinterException {
