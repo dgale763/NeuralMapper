@@ -15,7 +15,7 @@ import neuralmapper.model.Network;
 public class MainControl {
     public MainControl(NetworkControl network, GUIControl gui){   
         // Build Network
-        network.build(2,1,2,1);
+        network.build(7,2,6,10); // (Number of Inputs, Number of Deep Columns, Number of Deep Rows, Number of Outputs)
 
         // Translate network to GUI
         

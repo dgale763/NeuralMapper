@@ -361,58 +361,59 @@ public class GUIControl extends JPanel
         int numDeepRow = networkClone.getDeepRows();
         int numOut = networkClone.getOut();
         
-        int inStart = 20;
-        int deepStart = 20;
-        int outStart = 20;
-//        int mod = -20;
-        
-        int yOrigin = 0;
-        
-        // Change yOrigin for number of nodes
-        int tallestNode = 0;
-        if(numIn > tallestNode){
-            tallestNode = numIn;
-        }
-        else if(numDeepRow > tallestNode){
-            tallestNode = numDeepRow;
-        }
-        else if(numOut > tallestNode){
-            tallestNode = numOut;
-        }
-        yOrigin = 30*(tallestNode + 1);
-        
-        // Change starting Y for even/odd number of nodes
-        if(numIn % 2 == 0){
-            inStart = 50;
-        }
-        
-        if(numDeepRow % 2 == 0){
-            deepStart = 50;
-        }
-        
-        if(numOut % 2 == 0){
-            outStart = 50;
-        }
-        
+        int inStart = 0;
+        int deepStart = 0;
+        int outStart = 0;
         int curCol = 0;
         int curRow = 0;
         int w = 40;
         int h = 40;
         int colSep = 20;
-        int rowSep = 20;
+        int rowSep = 10;
         int inverter = -1;
+        int yOrigin = 0;
+        int tallestNode = 0;
+        
+        // Change yOrigin for number of nodes
+        
+        if(numIn > tallestNode){
+            tallestNode = numIn;
+        }
+        if(numDeepRow > tallestNode){
+            tallestNode = numDeepRow;
+        }
+        if(numOut > tallestNode){
+            tallestNode = numOut;
+        }
+        yOrigin = 25*(tallestNode + 1);
+        
+        // Change starting Y for even/odd number of nodes
+        if(numIn % 2 == 0){
+            inStart = 25;
+        }
+        
+        if(numDeepRow % 2 == 0){
+            deepStart = 25;
+        }
+        
+        if(numOut % 2 == 0){
+            outStart = 25;
+        }
+        
+        
         GraphicObjects.add(new Rectangle(0,yOrigin,400,1));
         
         Rectangle rect;
         // Paint Input Nodes
         for(int i = 0;i<numIn;i++){
-            rect = new Rectangle((w+colSep)*curCol,yOrigin+((inStart+((h+rowSep)*(curRow+1)))*(int)Math.pow(inverter, (double)i)),w,h);
-            // yOrigin + ((inStart + (curRow)*(rowWeight)) * (inv^i)
-            // 90      + ((60      + (0     )*(60       )) * (1)
-            // 90 + 60
-            // 150
+            rect = new Rectangle((w+colSep)*curCol,yOrigin+((inStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)i))-(h/2),w,h);
             GraphicObjects.add(rect);
-//            curRow++;
+            if(numIn % 2 == 0 && i!=0 && i % 2 != 0){
+                curRow++;
+            }
+            else if(numIn % 2 != 0 && i % 2 == 0){
+                curRow++;
+            }
         }
         curRow = 0;
         curCol++;
@@ -420,9 +421,14 @@ public class GUIControl extends JPanel
         // Paint Deep Nodes
         for(int i = 1;i<=numDeepCol;i++){
             for(int j=0;j<numDeepRow;j++){
-//                rect = new Rectangle((w+colSep)*curCol,curRow*rowWeight,w,h);
-//                GraphicObjects.add(rect);
-                curRow++;
+                rect = new Rectangle((w+colSep)*curCol,yOrigin+((deepStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)j))-(h/2),w,h);
+                GraphicObjects.add(rect);
+                if(numDeepRow % 2 == 0 && j!=0 && j % 2 != 0){
+                    curRow++;
+                }
+                else if(numDeepRow % 2 != 0 && j % 2 == 0){
+                    curRow++;
+                }
             }
             curRow = 0;
             curCol++;
@@ -430,14 +436,19 @@ public class GUIControl extends JPanel
         curRow = 0;
 
         // Paint Output Nodes
-        for(int i = 1; i <= numOut; i++) {
-//            rect = new Rectangle((w+colSep)*curCol,curRow*rowWeight,w,h);
-//            GraphicObjects.add(rect);
-            curRow++;
+        for(int i = 0; i < numOut; i++) {
+            rect = new Rectangle((w+colSep)*curCol,yOrigin+((outStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)i))-(h/2),w,h);
+            GraphicObjects.add(rect);
+            if(numOut % 2 == 0 && i!=0 && i % 2 != 0){
+                curRow++;
+            }
+            else if(numOut % 2 != 0 && i % 2 == 0){
+                curRow++;
+            }
         }
         curCol++;
         curRow = 0;
-        System.out.println(GraphicObjects.size());
+//        System.out.println(GraphicObjects.size());
         drawingPane.revalidate();
         drawingPane.repaint();
     }
