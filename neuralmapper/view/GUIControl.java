@@ -22,6 +22,8 @@ public class GUIControl extends JPanel
                          Printable{
     private Dimension area; //indicates area taken up by graphics
     private Vector<Rectangle> GraphicObjects; //coordinates used to draw graphics
+    private ArrayList<ArrayList<Point>> lineStarts;
+    private ArrayList<ArrayList<Point>> lineEnds;
     private JComponent newContentPane;
     private JPanel drawingPane;
     private Point clickPoint;
@@ -35,6 +37,11 @@ public class GUIControl extends JPanel
     private JMenu fileMenu;
     private JMenu helpMenu;
     private JMenuItem menuItem;
+    private JButton changeButton;
+    private JTextArea newIn;
+    private JTextArea newDeepCol;
+    private JTextArea newDeepRow;
+    private JTextArea newOut;
     
     private Boolean isHit = false;
     
@@ -42,6 +49,13 @@ public class GUIControl extends JPanel
     
     public GUIControl() {
         super(new BorderLayout());
+        
+        newIn = new JTextArea();
+        newDeepCol = new JTextArea();
+        newDeepRow = new JTextArea();
+        newOut = new JTextArea();
+        
+        changeButton = new JButton("Submit Changes");
         
         clickPoint = new Point(0,0);
         area = new Dimension(0,0);
@@ -119,11 +133,11 @@ public class GUIControl extends JPanel
         
         optionsPanel.setLayout(new GridLayout(10,1));
         
-        ButtonGroup group1 = new ButtonGroup();
-        ButtonGroup group2 = new ButtonGroup();
-        JRadioButton red = new JRadioButton("Red");
-        JRadioButton green = new JRadioButton("Green");
-        JRadioButton blue = new JRadioButton("Blue");
+//        ButtonGroup group1 = new ButtonGroup();
+//        ButtonGroup group2 = new ButtonGroup();
+//        JRadioButton red = new JRadioButton("Red");
+//        JRadioButton green = new JRadioButton("Green");
+//        JRadioButton blue = new JRadioButton("Blue");
 //        RectIcon rectIcon = new RectIcon(Color.BLACK);
 //        RectIcon customRectIcon = new RectIcon(rgb);
 //        OvalIcon ovalIcon = new OvalIcon();
@@ -132,38 +146,38 @@ public class GUIControl extends JPanel
 //        JButton rectangle = new JButton(rectIcon);
 //        JButton oval = new JButton(ovalIcon);
 //        JButton line = new JButton(lineIcon);
-        JRadioButton fillButton = new JRadioButton("Fill");
-        JRadioButton unfillButton = new JRadioButton("Unfilled");
-        JToggleButton moveButton = new JToggleButton("Move Tool");
+//        JRadioButton fillButton = new JRadioButton("Fill");
+//        JRadioButton unfillButton = new JRadioButton("Unfilled");
+//        JToggleButton moveButton = new JToggleButton("Move Tool");
         
-        red.setSelected(true);
-        red.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                redRadioActionPerformed(evt);
-            }
-        });
+//        red.setSelected(true);
+//        red.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                redRadioActionPerformed(evt);
+//            }
+//        });
+//        
+//        green.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                greenRadioActionPerformed(evt);
+//            }
+//        });
+//        
+//        blue.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                blueRadioActionPerformed(evt);
+//            }
+//        });
+//        
+//        
+//           
+//        
+//        group1.add(red);
+//        group1.add(green);
+//        group1.add(blue);
         
-        green.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                greenRadioActionPerformed(evt);
-            }
-        });
-        
-        blue.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                blueRadioActionPerformed(evt);
-            }
-        });
-        
-        
-           
-        
-        group1.add(red);
-        group1.add(green);
-        group1.add(blue);
-        
-        group2.add(fillButton);
-        group2.add(unfillButton);
+//        group2.add(fillButton);
+//        group2.add(unfillButton);
         
 //        group2.add(rectangle);
 //        group2.add(oval);
@@ -173,17 +187,31 @@ public class GUIControl extends JPanel
 //        optionsPanel.add(oval);
 //        optionsPanel.add(line);
 //        optionsPanel.add(new JLabel(""));
-        optionsPanel.addSeparator();
-        optionsPanel.add(fillButton);
-        optionsPanel.add(unfillButton);
+//        optionsPanel.addSeparator();
+//        optionsPanel.add(fillButton);
+//        optionsPanel.add(unfillButton);
 //        optionsPanel.add(new JLabel(""));
-        optionsPanel.addSeparator();
+//        optionsPanel.addSeparator();
 //        optionsPanel.add(customColorButton);
-        optionsPanel.add(red);
-        optionsPanel.add(green);
-        optionsPanel.add(blue);
-        optionsPanel.addSeparator();
-        optionsPanel.add(moveButton);
+//        optionsPanel.add(red);
+//        optionsPanel.add(green);
+//        optionsPanel.add(blue);
+//        optionsPanel.addSeparator();
+//        optionsPanel.add(moveButton);
+        
+        optionsPanel.add(new JLabel("Number of Inputs"));
+        optionsPanel.add(newIn);
+        
+        optionsPanel.add(new JLabel("Number of Deep Columns"));
+        optionsPanel.add(newDeepCol);
+        
+        optionsPanel.add(new JLabel("Number of Deep Rows"));
+        optionsPanel.add(newDeepRow);
+        
+        optionsPanel.add(new JLabel("Number of Outputs"));
+        optionsPanel.add(newOut);
+        
+        optionsPanel.add(changeButton);
         
 
         //Lay out this demo.
@@ -332,24 +360,66 @@ public class GUIControl extends JPanel
             Rectangle rect;
 //            System.out.println("GO SIZE: ");
             System.out.println(GraphicObjects.size());
+            g.setColor(Color.RED);
             for(int i = 0; i < GraphicObjects.size(); i++) {
                 rect = GraphicObjects.elementAt(i);
-                g.setColor(Color.RED);
                 g.drawOval(rect.x, rect.y, rect.width, rect.height);
             }
+            g.setColor(Color.BLACK);
+            
+//            for(int i = 0; i < lineStarts.size(); i++) {
+//                for(int j = 0; j < lineStarts.get(i).size(); j++){
+//                    g.drawLine(lineStarts.get(i).get(j).x, lineStarts.get(i).get(j).y, lineEnds.get(i).get(j).x, lineEnds.get(i).get(j).y);
+//                }
+//            }
+            
 //            g.drawOval(0,0,50,50);
         }
     }
+    
+    public JPanel getDrawingPane(){
+        return drawingPane;
+    }
 
     //Handle mouse events.
-    public void mouseReleased(MouseEvent e) {}
-    
-    public void mouseClicked(MouseEvent e){
+    public void mouseReleased(MouseEvent e) {
         Point curLoc = e.getPoint();
         clickPoint = curLoc;
+        if(shapeToMove != -1){
+            GraphicObjects.get(shapeToMove).x = clickPoint.x - xDiff;
+            GraphicObjects.get(shapeToMove).y = clickPoint.y - yDiff;
+        }
+        drawingPane.repaint();
     }
     
-    public void mousePressed(MouseEvent e){}
+    public void mouseClicked(MouseEvent e){
+        //Add code for 'click for info' functionality
+        System.out.println("CLICKED");
+    }
+    
+    private int shapeToMove = -1;
+    private int xDiff = 0;
+    private int yDiff = 0;
+    
+    public void mousePressed(MouseEvent e){
+//        System.out.println("LSKDJFLSDKFJ");
+        Point curLoc = e.getPoint();
+        clickPoint = curLoc;
+        
+        shapeToMove = -1;
+        int i = 0;
+        for(Rectangle r : GraphicObjects){
+            if(clickPoint.x >= r.x && clickPoint.x <= r.x + r.width){
+                if(clickPoint.y >= r.y && clickPoint.y <= r.y + r.height){
+//                    System.out.println("FFFFFFFFF");
+                    shapeToMove = i;
+                    xDiff = clickPoint.x - r.x;
+                    yDiff = clickPoint.y - r.y;
+                }
+            }
+            i++;
+        }
+    }
     public void mouseEntered(MouseEvent e){}
     public void mouseExited(MouseEvent e){}
 //    public void mousePressed(MouseEvent e){}
@@ -361,15 +431,18 @@ public class GUIControl extends JPanel
         int numDeepRow = networkClone.getDeepRows();
         int numOut = networkClone.getOut();
         
+        ArrayList<Point> startPoints = new ArrayList<>();
+        ArrayList<Point> endPoints = new ArrayList<>();
+        
         int inStart = 0;
         int deepStart = 0;
         int outStart = 0;
-        int curCol = 0;
+        int curCol = 2;
         int curRow = 0;
         int w = 40;
         int h = 40;
-        int colSep = 20;
-        int rowSep = 10;
+        int colSep = 40;
+        int rowSep = 30;
         int inverter = -1;
         int yOrigin = 0;
         int tallestNode = 0;
@@ -385,28 +458,31 @@ public class GUIControl extends JPanel
         if(numOut > tallestNode){
             tallestNode = numOut;
         }
-        yOrigin = 25*(tallestNode + 1);
+        yOrigin = ((h+rowSep)/2)*(tallestNode + 1);
         
         // Change starting Y for even/odd number of nodes
         if(numIn % 2 == 0){
-            inStart = 25;
+            inStart = (h+rowSep)/2;
         }
         
         if(numDeepRow % 2 == 0){
-            deepStart = 25;
+            deepStart = (h+rowSep)/2;
         }
         
         if(numOut % 2 == 0){
-            outStart = 25;
+            outStart = (h+rowSep)/2;
         }
+        GraphicObjects.clear();
         
         
-        GraphicObjects.add(new Rectangle(0,yOrigin,400,1));
+//        GraphicObjects.add(new Rectangle(0,yOrigin,400,1));
         
         Rectangle rect;
         // Paint Input Nodes
         for(int i = 0;i<numIn;i++){
             rect = new Rectangle((w+colSep)*curCol,yOrigin+((inStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)i))-(h/2),w,h);
+            startPoints.add(new Point(((w+colSep)*curCol)+w,(yOrigin+((inStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)i))-(h/2))+(h/2)));
+            
             GraphicObjects.add(rect);
             if(numIn % 2 == 0 && i!=0 && i % 2 != 0){
                 curRow++;
@@ -415,6 +491,9 @@ public class GUIControl extends JPanel
                 curRow++;
             }
         }
+//        lineStarts.add((ArrayList)startPoints);
+//        startPoints.clear();
+//        endPoints.clear();
         curRow = 0;
         curCol++;
 
@@ -422,6 +501,8 @@ public class GUIControl extends JPanel
         for(int i = 1;i<=numDeepCol;i++){
             for(int j=0;j<numDeepRow;j++){
                 rect = new Rectangle((w+colSep)*curCol,yOrigin+((deepStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)j))-(h/2),w,h);
+//                endPoints.add(new Point(((w+colSep)*curCol)+w,(yOrigin+((deepStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)i))-(h/2))+(h/2)));
+//                startPoints.add(new Point(((w+colSep)*curCol)+w,(yOrigin+((deepStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)i))-(h/2))+(h/2)));
                 GraphicObjects.add(rect);
                 if(numDeepRow % 2 == 0 && j!=0 && j % 2 != 0){
                     curRow++;
@@ -430,6 +511,10 @@ public class GUIControl extends JPanel
                     curRow++;
                 }
             }
+//            lineStarts.add(endPoints);
+//            lineEnds.add(startPoints);
+            endPoints.clear();
+            startPoints.clear();
             curRow = 0;
             curCol++;
         }
@@ -438,6 +523,8 @@ public class GUIControl extends JPanel
         // Paint Output Nodes
         for(int i = 0; i < numOut; i++) {
             rect = new Rectangle((w+colSep)*curCol,yOrigin+((outStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)i))-(h/2),w,h);
+            endPoints.add(new Point(((w+colSep)*curCol)+w,(yOrigin+((outStart+((h+rowSep)*(curRow)))*(int)Math.pow(inverter, (double)i))-(h/2))+(h/2)));
+
             GraphicObjects.add(rect);
             if(numOut % 2 == 0 && i!=0 && i % 2 != 0){
                 curRow++;
@@ -446,8 +533,13 @@ public class GUIControl extends JPanel
                 curRow++;
             }
         }
+        lineEnds.add(endPoints);
+//        endPoints.clear();
+//        startPoints.clear();
         curCol++;
         curRow = 0;
+//        System.out.println(lineStarts.size());
+//            System.out.println(lineEnds.size());
 //        System.out.println(GraphicObjects.size());
         drawingPane.revalidate();
         drawingPane.repaint();
@@ -476,6 +568,26 @@ public class GUIControl extends JPanel
         //Display the window.
         frame.pack();
         frame.setVisible(true);
+    }
+    
+    public JButton getChangeButton(){
+        return changeButton;
+    }
+    
+    public int getNewIn(){
+        return Integer.parseInt(newIn.getText());
+    }
+    
+    public int getNewDeepC(){
+        return Integer.parseInt(newDeepCol.getText());
+    }
+    
+    public int getNewDeepR(){
+        return Integer.parseInt(newDeepRow.getText());
+    }
+    
+    public int getNewOut(){
+        return Integer.parseInt(newOut.getText());
     }
     
     public GUIControl getContentPane(){
